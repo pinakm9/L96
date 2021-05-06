@@ -1,0 +1,15 @@
+{
+"Deterministic": "True",
+"Model": "Lorenz96",
+"Hidden state dimension": 10,
+"Number of assimilation steps": 50,
+"Numpy seed": 2021,
+"Observation covariance": 0.1,
+"Observation gap": 0.2,
+"Particle count": 500,
+"Prior covariance": 1.0,
+"Resampling covariance": 0.05,
+"Resampling method": "systematic_noisy",
+"Resampling threshold": 0.1,
+"Shift": [0.0,  0.0,  0.0]
+}

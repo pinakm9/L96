@@ -1,0 +1,13 @@
+{
+"Deterministic": "True",
+"Model": "Lorenz63_xy",
+"Number of assimilation steps": 100,
+"Observation covariance": 0.1,
+"Observation gap": 0.4,
+"Particle count": 3000,
+"Prior covariance": 0.01,
+"Resampling covariance": 0.08,
+"Resampling method": "systematic_noisy",
+"Resampling threshold": 0.1,
+"Shift": [3.0,  3.0,  3.0]
+}

@@ -1,0 +1,5 @@
+Precision: 0.01, 0.1, 1.0
+Accuracy: 0.0, 3.0, 6.0
+Obs gap: 0.2, 0.4, 0.6
+Obs Cov: 0.1, 1.0
+Steps: 100
