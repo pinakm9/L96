@@ -29,10 +29,10 @@ for file in config_files[2:]:
         config = json.load(f)
     # set random seed
     seed = config["Numpy seed"]
-    np.random.seed(2022)
+    np.random.seed(42)
     # set model
     dim = config["Hidden state dimension"]
-    ev_time = 1000#config["Number of assimilation steps"]
+    ev_time = 100#config["Number of assimilation steps"]
     prior_cov = config["Prior covariance"]
     obs_cov = config["Observation covariance"]
     shift = config['Shift'][0]
@@ -56,7 +56,7 @@ for file in config_files[2:]:
 
     # assimilate
     print("starting assimilation ... ")
-    pf = lpf.LocalPF2(20, 3.6, 0.5, index_map, model, particle_count = 100, folder = cc.res_path)
+    pf = lpf.LocalPF2(20, 3.6, 1.0, index_map, model, particle_count = 100, folder = cc.res_path)
     pf.update(observed_path, method = 'mean')
     #print(pf.H(hidden_path[3]))
     #print(pf.find_eic(observed_path[1]))
@@ -68,7 +68,7 @@ for file in config_files[2:]:
         print(hidden_path - pf.computed_trajectory)
         pf.plot_trajectories(hidden_path, coords_to_plot=[0, 1, 38, 39], file_path=cc.res_path + '/trajectories.png', measurements=False)
         pf.compute_error(hidden_path)
-        pf.plot_error(semilogy=True)
+        pf.plot_error(semilogy=True, resampling=False)
         config['Status'] = pf.status
         cc.add_params(config)
         cc.write(mode='json')

@@ -1,0 +1,1 @@
+{"Deterministic": "True", "Model": "Lorenz96_alt", "Hidden state dimension": 10, "Number of assimilation steps": 500, "Numpy seed": 0, "Observation covariance": 0.001, "Observation gap": 0.1, "Particle count": 40, "Prior covariance": 1.0, "Resampling threshold": 8, "Shift": 2.0, "Status": "success"}

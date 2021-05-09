@@ -214,7 +214,7 @@ class ParticleFilter(Filter):
         return len(np.unique(indices))
 
 
-    def systematic_noisy_resample(self, noise=0.1):
+    def systematic_noisy_resample(self, noise=0.5):
         # make N subdivisions, and choose positions with a consistent random offset
         positions = (np.random.random() + np.arange(self.particle_count)) / self.particle_count
 
@@ -340,7 +340,7 @@ class ParticleFilter(Filter):
             
             if method is not None:
                 self.compute_trajectory(method = method)
-            #self.record(observation)
+            self.record(observation)
             if hasattr(self, 'status') and self.status == 'faliure':
                 break
             self.current_time += 1
@@ -349,28 +349,35 @@ class ParticleFilter(Filter):
         return self.status
 
     def plot_error(self, show = False, folder = None, title = None, semilogy = False, resampling = True):
-        signals = [self.abs_error if not semilogy else np.log(self.rmse)]
+        signals = [self.abs_error]
         labels = ['absolute error']
         styles = [{'linestyle':'solid'}]
         plt_fns = ['semilogy' if semilogy else 'plot']
         colors = ['black']
         if resampling:
-            resampling_lines = [self.abs_error[i] if self.resampling_tracker[i] else np.nan for i in range(len(self.error))]
+            resampling_lines = [self.abs_error[i] if self.resampling_tracker[i] else np.nan for i in range(len(self.abs_error))]
             signals.append(resampling_lines)
             labels.append('resampling tracker')
             styles.append({'marker':'o'})
             plt_fns.append('scatter')
             colors.append('red')
+        sigma = np.average(np.sqrt(np.diag(self.model.observation.sigma)))
+        obs_std = sigma * np.ones(len(self.abs_error))
+        signals.append(obs_std)
+        labels.append('avg observation std')
+        styles.append({'linestyle': 'dashed'})
+        plt_fns.append('semilogy' if semilogy else 'plot')
+        colors.append('grey')
         plot.SignalPlotter(signals = signals).plot_signals(labels = labels, styles = styles, plt_fns = plt_fns, colors = colors,\
                            show = show, file_path = self.folder + '/l2_error.png', title = title)
 
-        signals = [self.rmse if not semilogy else np.log(self.rmse)]
+        signals = [self.rmse]
         labels = ['rmse']
         styles = [{'linestyle':'solid'}]
         plt_fns = ['semilogy' if semilogy else 'plot']
         colors = ['black']
         if resampling:
-            resampling_lines = [self.rmse[i] if self.resampling_tracker[i] else np.nan for i in range(len(self.error))]
+            resampling_lines = [self.rmse[i] if self.resampling_tracker[i] else np.nan for i in range(len(self.abs_error))]
             signals.append(resampling_lines)
             labels.append('resampling tracker')
             styles.append({'marker':'o'})

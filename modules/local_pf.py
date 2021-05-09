@@ -84,8 +84,8 @@ class LocalPF(fl.ParticleFilter):
     def one_step_update(self, observation):
         if self.current_time > 0:
             # pre-regularization
-            self.particles = np.array([self.model.hidden_state.sims[self.current_time].algorithm(self.current_time, particle) +\
-                            np.random.normal(loc=0.0, scale=0.1, size=self.model.hidden_state.dimension) for particle in self.particles]) 
+            self.particles = np.array([self.model.hidden_state.sims[self.current_time].algorithm(self.current_time, particle)\
+                                      for particle in self.particles]) 
         self.weights = np.ones((self.particle_count, self.model.hidden_state.dimension)) / self.particle_count
         #elif len(self.particles) != self.particle_count:
         #    self.particles = self.model.hidden_state.sims[0].generate(self.particle_count)
@@ -131,7 +131,7 @@ class LocalPF(fl.ParticleFilter):
                     r2 = 1.
 
                 self.new_particles[:, j] = bar_x_j + self.mixing_param * r1 * (self.resampled_particles[:, j] - bar_x_j) +\
-                                           (self.mixing_param * (r2 - 1.) + 1.) * (self.new_particles[:, j] - bar_x_j)
+                                           (self.mixing_param * (r2 - 1.) + 1.) * (self.new_particles[:, j] - bar_x_j) +  np.random.normal(loc=0.0, scale=0.5, size=self.particle_count)
         self.particles = copy.deepcopy(self.new_particles)
         
 
@@ -139,7 +139,7 @@ class LocalPF(fl.ParticleFilter):
     @ut.timer
     def update(self, observations, method = 'mean', record_path = None, **params):
         """
-        Description:
+        Description: 
             Updates using all the obeservations using self.one_step_update 
         Args:
             observations: list/np.array of observations to pass to self.one_step_update
@@ -153,7 +153,7 @@ class LocalPF(fl.ParticleFilter):
         for observation in self.observed_path:
             self.one_step_update(observation = observation)
             for j in range(self.model.hidden_state.dimension):
-                self.particles[:, j] += np.random.normal(loc=0.0, scale=0.5, size=self.particle_count)
+                self.particles[:, j] += np.random.normal(loc=0.0, scale=0.26, size=self.particle_count)
             self.resampling_tracker.append(True)
             if method is not None:
                 self.compute_trajectory(method = method)
@@ -212,3 +212,13 @@ class LocalPF2(LocalPF):
                 self.beta[k] += (beta_hat[i] - 1.) * gasp_cohn(self.index_map[i], self.index_map[k], self.r_loc)
         print(self.beta)
         return self.beta
+
+    def compute_trajectory(self, method = 'mean'):
+        """
+        Description:
+            Computes hidden trajectory
+        """
+        if method == 'mean':
+            new_hidden_state = np.array([self.particles[:, j].sum()/self.particle_count for j in range(self.model.hidden_state.dimension)])
+            self.computed_trajectory = np.append(self.computed_trajectory, [new_hidden_state], axis = 0)
+        return self.computed_trajectory

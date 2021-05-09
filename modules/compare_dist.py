@@ -247,6 +247,7 @@ class PFComparison:
             ensemble_1 = tf.convert_to_tensor(ensemble_1, dtype=tf.float32)
             ensemble_2 = tf.convert_to_tensor(ensemble_2, dtype=tf.float32)
             kl_dist[itr] = ws.sinkhorn_loss(ensemble_1, ensemble_2, epsilon=epsilon, num_iter=num_iter, p=p) ** (1.0/p)
+            #print(kl_dist)
         hdf5_1.close()
         hdf5_2.close()
         #pd.DataFrame(kl_dist).to_csv(saveas + '.csv' if saveas is not None else 'filter_comparison.csv', header=None, index=None)
@@ -260,7 +261,7 @@ class PFComparison:
             plt.scatter(x[idx_2], kl_dist[idx_2], color='red')
             plt.plot(x, np.zeros(len(x)), color='green', label='x-axis')
             plt.xlabel('assimilation step')
-            plt.ylabel('approximate KL divergence')
+            plt.ylabel('approximate Sinkhorn distance')
             plt.title('{} vs {}'.format(self.file_1[:-3], self.file_2[:-3]))
             plt.legend()
             if saveas is None:
