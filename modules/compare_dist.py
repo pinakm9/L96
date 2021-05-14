@@ -246,7 +246,7 @@ class PFComparison:
             ensemble_2 = np.array(getattr(hdf5_2.root.particles, 'time_' + str(itr)).read().tolist())
             ensemble_1 = tf.convert_to_tensor(ensemble_1, dtype=tf.float32)
             ensemble_2 = tf.convert_to_tensor(ensemble_2, dtype=tf.float32)
-            w_dist[itr] = ws.sinkhorn_div(ensemble_1, ensemble_2, epsilon=epsilon, num_iters=num_iter, p=p) #** (1.0/p)
+            w_dist[itr] = ws.sinkhorn_div_tf(ensemble_1, ensemble_2, epsilon=epsilon, num_iters=num_iter, p=p) #** (1.0/p)
             #print(w_dist)
         hdf5_1.close()
         hdf5_2.close()

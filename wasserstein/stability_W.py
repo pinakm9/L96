@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 np.random.seed(2021)
-ev_time = 500
+ev_time = 100
 num_obs = 1
 
 expr_folder = 'results_b'
@@ -28,8 +28,8 @@ for i in range(len(configs)):
         config_id_2 = configs[j].split('_')[1][:-5]
         data = {'time': [], 'obs_id':[], 'Wasserstein_2': []}
         for obs in range(num_obs):
-            assml_file_1 = expr_folder + '/{}_seed_{}#3/assimilation.h5'.format(config_id_1, obs)
-            assml_file_2 = expr_folder + '/{}_seed_{}#3/assimilation.h5'.format(config_id_2, obs)
+            assml_file_1 = expr_folder + '/{}_seed_{}#5/assimilation.h5'.format(config_id_1, obs)
+            assml_file_2 = expr_folder + '/{}_seed_{}#5/assimilation.h5'.format(config_id_2, obs)
             print('comparing {} vs {} for observation realization {} ...'.format(config_id_1, config_id_2, obs))
             pf_comp = cd.PFComparison(assml_file_1, assml_file_2)
             data['time'] += list(range(ev_time))
