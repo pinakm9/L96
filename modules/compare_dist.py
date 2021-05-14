@@ -240,25 +240,25 @@ class PFComparison:
         hdf5_1 = tables.open_file(self.file_1, 'r')
         hdf5_2 = tables.open_file(self.file_2, 'r')
         iterations = len(hdf5_1.root.observation.read().tolist())
-        kl_dist = np.zeros(iterations, dtype=np.float32)
+        w_dist = np.zeros(iterations, dtype=np.float32)
         for itr in range(iterations):
             ensemble_1 = np.array(getattr(hdf5_1.root.particles, 'time_' + str(itr)).read().tolist())
             ensemble_2 = np.array(getattr(hdf5_2.root.particles, 'time_' + str(itr)).read().tolist())
             ensemble_1 = tf.convert_to_tensor(ensemble_1, dtype=tf.float32)
             ensemble_2 = tf.convert_to_tensor(ensemble_2, dtype=tf.float32)
-            kl_dist[itr] = ws.sinkhorn_loss(ensemble_1, ensemble_2, epsilon=epsilon, num_iter=num_iter, p=p) ** (1.0/p)
-            #print(kl_dist)
+            w_dist[itr] = ws.sinkhorn_div(ensemble_1, ensemble_2, epsilon=epsilon, num_iters=num_iter, p=p) #** (1.0/p)
+            #print(w_dist)
         hdf5_1.close()
         hdf5_2.close()
-        #pd.DataFrame(kl_dist).to_csv(saveas + '.csv' if saveas is not None else 'filter_comparison.csv', header=None, index=None)
+        #pd.DataFrame(w_dist).to_csv(saveas + '.csv' if saveas is not None else 'filter_comparison.csv', header=None, index=None)
         if saveas is not None:
             plt.figure(figsize = (8, 8))
             x = np.array(list(range(iterations)))
-            idx_1 = np.where(kl_dist >= 0.0)
-            idx_2 = np.where(kl_dist < 0.0)
-            x_, y_ = x[idx_1], kl_dist[idx_1]
+            idx_1 = np.where(w_dist >= 0.0)
+            idx_2 = np.where(w_dist < 0.0)
+            x_, y_ = x[idx_1], w_dist[idx_1]
             plt.scatter(x_, y_, color='blue')
-            plt.scatter(x[idx_2], kl_dist[idx_2], color='red')
+            plt.scatter(x[idx_2], w_dist[idx_2], color='red')
             plt.plot(x, np.zeros(len(x)), color='green', label='x-axis')
             plt.xlabel('assimilation step')
             plt.ylabel('approximate Sinkhorn distance')
@@ -270,7 +270,7 @@ class PFComparison:
                 saveas = saveas + '.png'
             plt.savefig(saveas)
         else:
-            return kl_dist
+            return w_dist
 
 class PFvsKF:
     def __init__(self, pf_file, kf_file):
